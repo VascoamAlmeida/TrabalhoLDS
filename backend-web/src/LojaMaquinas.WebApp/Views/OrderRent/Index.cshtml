@@ -1,0 +1,39 @@
+﻿@model IEnumerable<LojaMaquinas.WebApp.ViewModels.MVC.OrderRent.OrderRentViewModel>
+
+@{
+	ViewData["Title"] = "Lista de alugueres";
+}
+
+<h2>Alugueres</h2>
+<hr />
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Order Id</th>
+			<th>Start Date</th>
+			<th>End Date</th>
+			<th>Estado</th>
+			<th></th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@item.Id</td>
+				<td>@item.OrderId</td>
+				<td>@item.InitialDate</td>
+				<td>@item.EndDate</td>
+				<td>@item.Status</td>
+				<td>
+					<a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+					<a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+					<a asp-action="Delete" asp-route-id="@item.Id">Remover</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

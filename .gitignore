@@ -1,0 +1,41 @@
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+
+# .NET
+**/bin/
+**/obj/
+**/TestResults/
+*.trx
+coverage.xml
+coveragereport/
+
+# Node / Playwright
+**/node_modules/
+**/playwright-report/
+**/test-results/
+
+# Flutter / Dart
+**/.dart_tool/
+**/.pub-cache/
+**/build/
+**/coverage/
+**/coverage_report/
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+**/google-services.json
+**/secrets.properties
+*.jks
+*.keystore
+
+# Runtime data / uploads
+backend-web/src/LojaMaquinas.WebApp/wwwroot/images/orderRent/*
+!backend-web/src/LojaMaquinas.WebApp/wwwroot/images/orderRent/.gitkeep

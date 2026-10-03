@@ -1,0 +1,158 @@
+﻿@using LojaMaquinas.Business.Models.Enums
+@model LojaMaquinas.WebApp.ViewModels.MVC.OrderRent.OrderRentViewModel
+
+@{
+	ViewData["Title"] = "Detalhes de Aluguer";
+}
+
+<div class="container mt-4">
+	<div class="card shadow-sm border-0">
+		<div class="card-header text-white" style="background-color: #1e3a5f;">
+			<h4 class="mb-0">
+				<i class="fas fa-handshake me-2"></i>Detalhes do Aluguer
+			</h4>
+		</div>
+
+
+		<div class="card-body">
+
+			<div class="row mb-3">
+			<div class="col-md-6">
+				<label class="form-label fw-semibold text-muted">ID</label>
+				<p class="form-control-plaintext">
+						<i class="fas fa-hashtag text-success me-2"></i>@Model.Id
+				</p>
+			</div>
+
+			<div class="col-md-6">
+				<label class="form-label fw-semibold text-muted">ORDER ID</label>
+				<p class="form-control-plaintext">
+						<i class="fas fa-hashtag text-success me-2"></i>@Model.OrderId
+				</p>
+			</div>
+			</div>
+
+			<div class="row mb-3">
+			<div class="col-md-6">
+				<label class="form-label fw-semibold text-muted">DATA INÍCIO</label>
+					<p class="form-control-plaintext">
+						<i class="fas fa-calendar-alt text-primary me-2"></i>
+						@Model.InitialDate.ToString("dd/MM/yyyy HH:mm")
+					</p>
+			</div>
+			
+
+			<div class="col-md-6">
+				<label class="form-label fw-semibold text-muted">DATA FIM</label>
+					<p class="form-control-plaintext">
+						<i class="fas fa-calendar-alt text-primary me-2"></i>
+						@Model.EndDate.ToString("dd/MM/yyyy HH:mm")
+					</p>
+			</div>
+			</div>
+
+			<div class="row mb-3">
+			<div class="col-md-6">
+				<label class="form-label fw-semibold text-muted">ESTADO</label>
+				<p class="form-control-plaintext">
+					@if (Model.Status == OrderRentStatus.Approved)
+					{
+						<span class="badge bg-warning fs-6">
+							<i class="fas fa-clock me-1"></i>Approved
+						</span>
+					}
+					else if (Model.Status == OrderRentStatus.Active)
+					{
+						<span class="badge bg-info fs-6">
+							<i class="fas fa-spinner me-1"></i>Ativo
+						</span>
+					}
+					else if (Model.Status == OrderRentStatus.Completed)
+					{
+						<span class="badge bg-success fs-6">
+							<i class="fas fa-check-circle me-1"></i>Concluído
+						</span>
+					}
+					else if (Model.Status == OrderRentStatus.Cancelled)
+					{
+						<span class="badge bg-danger fs-6">
+							<i class="fas fa-times-circle me-1"></i>Cancelado
+						</span>
+					}
+				</p>
+			</div>
+			</div>
+
+
+			@if (!string.IsNullOrEmpty(Model.CompanyImage))
+			{
+				<div class="row mb-3">
+					<div class="col-md-12">
+						<label class="form-label fw-semibold text-muted">FOTO DA EMPRESA</label>
+						<div class="border rounded-3 p-3 bg-light d-flex align-items-center">
+							<img src="@Model.CompanyImage"
+								 class="img-thumbnail me-3"
+								 style="max-width: 200px; max-height: 200px;" />
+							<span class="text-muted">
+								<i class="fas fa-info-circle me-2"></i>
+								Estado da máquina à saída da empresa.
+							</span>
+						</div>
+					</div>
+				</div>
+			}
+
+			@if (Model.Status == OrderRentStatus.Completed && !string.IsNullOrEmpty(Model.UserImage))
+			{
+				<div class="row mb-3">
+					<div class="col-md-12">
+						<label class="form-label fw-semibold text-muted">FOTO DO UTILIZADOR</label>
+						<div class="border rounded-3 p-3 bg-light d-flex align-items-center">
+							<img src="@Model.UserImage"
+								 class="img-thumbnail me-3"
+								 style="max-width: 200px; max-height: 200px;" />
+							<span class="text-muted">
+								<i class="fas fa-user-check me-2"></i>
+								Foto de devolução do equipamento.
+							</span>
+						</div>
+					</div>
+				</div>
+			}
+
+		</div>
+
+		<div class="card-footer bg-light d-flex justify-content-between">
+			<a asp-action="Index" class="btn btn-outline-secondary">
+				<i class="fas fa-arrow-left"></i>&nbsp;Voltar à lista
+			</a>
+			<div>
+				<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">
+					<i class="fas fa-edit"></i>&nbsp;Editar
+				</a>
+				<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+					<i class="fas fa-trash-alt"></i>&nbsp;Remover
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<style>
+	.form-label.fw-semibold {
+		font-weight: 600;
+		margin-bottom: 5px;
+		font-size: 0.85rem;
+	}
+
+	.form-control-plaintext {
+		font-size: 1.05rem;
+		padding: 8px 0;
+	}
+
+	.badge {
+		padding: 8px 15px;
+	}
+</style>

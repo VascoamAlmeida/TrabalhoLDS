@@ -1,0 +1,134 @@
+@model LojaMaquinas.WebApp.ViewModels.MVC.OrderViewModel
+
+@{
+    ViewData["Title"] = "Detalhes da Transação";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">ESTADO</label>
+            <p class="form-control-plaintext">
+                @if (Model.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Pending)
+                {
+                    <span class="badge bg-warning fs-6">
+                        <i class="fas fa-clock me-1"></i>Pendente
+                    </span>
+                }
+                else if (Model.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Active)
+                {
+                    <span class="badge bg-info fs-6">
+                        <i class="fas fa-spinner me-1"></i>Ativo
+                    </span>
+                }
+                else if (Model.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Completed)
+                {
+                    <span class="badge bg-success fs-6">
+                        <i class="fas fa-check-circle me-1"></i>Concluído
+                    </span>
+                }
+                else if (Model.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Cancelled)
+                {
+                    <span class="badge bg-danger fs-6">
+                        <i class="fas fa-times-circle me-1"></i>Cancelado
+                    </span>
+                }
+            </p>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">TIPO</label>
+            <p class="form-control-plaintext">
+                @if (Model.Type == LojaMaquinas.Business.Models.Enums.OrderType.Sale)
+                {
+                    <span class="badge bg-primary fs-6">
+                        <i class="fas fa-shopping-cart me-1"></i>Venda
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary fs-6">
+                        <i class="fas fa-handshake me-1"></i>Aluguer
+                    </span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">DATA DO PEDIDO</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-calendar text-primary me-2"></i>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")
+            </p>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">TOTAL</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-euro-sign text-success me-2"></i>@Model.Total.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">CLIENTE</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-user text-info me-2"></i>@(Model.Client != null ? Model.Client.FirstName + " " + (Model.Client.LastName ?? "") : "N/A")
+            </p>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">PRODUTO/MÁQUINA</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-cogs text-warning me-2"></i>@(Model.Stock != null && Model.Stock.Product != null ? Model.Stock.Product.Name : "N/A")
+            </p>
+        </div>
+    </div>
+
+    @if (Model.Type == LojaMaquinas.Business.Models.Enums.OrderType.Rent)
+    {
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label class="form-label fw-semibold text-muted">PERÍODO DE ALUGUER</label>
+                <div class="border rounded-3 p-3 bg-light">
+                    <p class="mb-0">
+                        <i class="fas fa-calendar-alt text-secondary me-2"></i>
+                        <strong>Início:</strong> @Model.OrderDate.ToString("dd/MM/yyyy")
+                        <span class="mx-2">→</span>
+                        <strong>Fim:</strong> @Model.OrderDate.AddDays(30).ToString("dd/MM/yyyy")
+                        <span class="text-muted ms-2">(30 dias)</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Stock != null)
+    {
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label class="form-label fw-semibold text-muted">REFERÊNCIA DO STOCK</label>
+                <p class="form-control-plaintext">
+                    <i class="fas fa-barcode text-secondary me-2"></i>@Model.Stock.Ref
+                </p>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+    }
+
+    .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 8px 0;
+    }
+
+    .badge {
+        padding: 8px 15px;
+    }
+</style>

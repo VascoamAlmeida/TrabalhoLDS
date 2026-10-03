@@ -1,0 +1,642 @@
+﻿@model IEnumerable<LojaMaquinas.WebApp.ViewModels.MVC.StockViewModel>
+
+@{
+    ViewData["Title"] = "Gestão de Stock";
+    ViewData["CurrentPage"] = "Gestão de Stock";
+}
+
+<style>
+    .product-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .filters-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    .filters-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 6px;
+    }
+
+    .filter-select,
+    .filter-input {
+        padding: 10px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: #f8f9fa;
+        transition: all 0.3s;
+    }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: #0099cc;
+            background-color: white;
+        }
+
+    .btn-add-product {
+        padding: 10px 20px;
+        background-color: #0099cc;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+        .btn-add-product:hover {
+            background-color: #007aa3;
+            transform: translateY(-1px);
+        }
+
+    .product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .product-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        transition: all 0.3s;
+    }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .card-icon.pending {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .card-icon.inprogress {
+            background-color: #ffe5d0;
+            color: #d97a29;
+        }
+
+        .card-icon.completed {
+            background-color: #d1f2eb;
+            color: #0aa078;
+        }
+
+        .card-icon.machine {
+            background-color: #d1f2eb;
+            color: #0aa078;
+        }
+
+        .card-icon.part {
+            background-color: #ffe5d0;
+            color: #d97a29;
+        }
+
+        .card-icon i {
+            font-size: 22px;
+        }
+
+    .card-content {
+        flex: 1;
+    }
+
+    .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .product-type {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+    .product-date {
+        font-size: 13px;
+        color: #666;
+    }
+
+    .product-machine {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .product-description {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .status-badge.completed,
+        .status-badge.machine {
+            background-color: #d1f2eb;
+            color: #0aa078;
+        }
+
+        .status-badge.inprogress,
+        .status-badge.part {
+            background-color: #ffe5d0;
+            color: #d97a29;
+        }
+
+        .status-badge.pending {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-buy {
+        color: white;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+        .btn-buy:hover {
+            background-color: #1e7e34;
+            border-color: #1c7430;
+        }
+
+    .btn-action {
+        padding: 6px 14px;
+        border: 1px solid #dee2e6;
+        background-color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .btn-action:hover {
+            background-color: #f8f9fa;
+        }
+
+    .btn-edit {
+        color: #0099cc;
+        border-color: #0099cc;
+    }
+
+        .btn-edit:hover {
+            background-color: #e7f3f8;
+        }
+
+    .btn-delete {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-delete:hover {
+            background-color: #fff5f5;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+    @@media (max-width: 768px) {
+        .filters-row {
+            grid-template-columns: 1fr;
+        }
+
+        .product-card {
+            flex-direction: column;
+        }
+
+        .card-header-row {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="product-container">
+    <h1 class="page-title">Gestão de Stock</h1>
+
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label class="filter-label">Produto</label>
+                <select class="filter-select" id="filterProduct">
+                    <option value="">Todos os Produtos</option>
+
+                    @if (ViewBag.Products != null)
+                    {
+                        foreach (var product in ViewBag.Products)
+                        {
+                            <option value="@product.Id">@product.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Referência do item</label>
+                <input type="text" class="filter-input" id="filterName" placeholder="Pesquisar por referência..." />
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Estado do Item</label>
+                <select class="filter-select" id="filterIsActive">
+                    <option value="">Todos</option>
+                    <option value="Available">Disponível</option>
+                    <option value="SoldOut">Vendido</option>
+                    <option value="NotAvailable">Indisponível</option>
+                </select>
+            </div>
+
+                <button class="btn-add-product" data-toggle="modal" data-target="#createModal">
+                    <i class="fas fa-plus me-2"></i>Novo Item
+                </button>
+            
+        </div>
+    </div>
+
+    <div class="product-list" id="productList">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var stock in Model)
+            {
+                var typeClass = stock.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.Available ? "available" :
+                stock.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.SoldOut ? "sold" :
+                stock.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.NotAvailable ? "not available" : "not available";
+                var typeText = stock.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.Available ? "Disponível" :
+                stock.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.SoldOut ? "Vendido" :
+                stock.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.NotAvailable ? "Indisponível" : "Indisponível";
+
+                <div class="product-card"
+                     data-product-id="@stock.ProductId"
+                     data-stock-status="@stock.StockStatus"
+                     data-ref="@stock.Ref.ToString().ToLower()">
+                    <div class="card-icon @typeClass">
+                        <i class="fas @(typeClass == "available" ? "fa-cogs" : "fa-wrench")"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div>
+                                <div class="product-type">Item</div>
+                                <div class="product-date">@stock.Ref</div>
+                            </div>
+                            <div class="status-badge @typeClass">@typeText</div>
+                        </div>
+                        <div class="product-machine">
+                            <strong>Produto:</strong> @stock.Product.Name
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-action" data-toggle="modal" data-target="#detailsModal" data-id="@stock.Id">
+                                <i class="fas fa-eye me-1"></i>Detalhes
+                            </button>
+
+                            <button class="btn-action btn-edit" data-toggle="modal" data-target="#editModal" data-id="@stock.Id">
+                                <i class="fas fa-pencil-alt me-1"></i>Editar
+                            </button>
+                        
+                            <button class="btn-action btn-delete" data-id="@stock.Id" data-name="@stock.Ref">
+                                <i class="fas fa-times me-1"></i>Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Nenhum item encontrado</p>
+            </div>
+        }
+    </div>
+</div>
+
+<partial name="_ModalCreate" />
+<partial name="_ModalDetails" />
+<partial name="_ModalEdit" />
+@section Scripts {
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        toastr.options = {
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            extendedTimeOut: 3000,
+            showDuration: 300,
+            hideDuration: 300,
+        }
+
+        $(document).ready(function () {
+            var baseUrl = '@Url.Content("~")';
+
+            // CREATE MODAL
+            $('#createModal').on('show.bs.modal', function (event) {
+                var modal = $(this);
+                $.ajax({
+                    url: baseUrl + '/stock-create/',
+                    type: 'GET',
+                    success: function (data) {
+                        modal.find('.modal-body').html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erro ao carregar modal de criação:', xhr.responseText);
+                        Swal.fire({
+                            allowOutsideClick: false,
+                            icon: "error",
+                            title: "Erro ao carregar formulário",
+                            text: "Não foi possível carregar o formulário de criação. " + (xhr.responseText || error)
+                        });
+                    }
+                });
+
+                $('#CreateSaveButton').off('click').on('click', function () {
+                    var form = $('#CreateForm');
+                    var formData = form.serialize();
+
+                    $.ajax({
+                        url: baseUrl + '/stock-create/',
+                        type: 'POST',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                setTimeout(function () { location.reload(); }, 3000);
+                            } else {
+                                if (Array.isArray(response.errors)) {
+                                    response.errors.forEach(function (error) { toastr.error(error); });
+                                } else if (typeof response.errors === 'string') {
+                                    toastr.error(response.errors);
+                                } else {
+                                    toastr.error('Ocorreu um erro desconhecido!');
+                                }
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Erro ao processar o pedido!');
+                        }
+                    });
+                });
+            });
+
+            // DETAILS MODAL
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+
+                $.ajax({
+                    url: baseUrl + '/stock-details/' + id,
+                    type: 'GET',
+                    success: function (data) {
+                        modal.find('.modal-body').html(data);
+                    },
+                    error: function () {
+                        Swal.fire({
+                            allowOutsideClick: false,
+                            icon: "error",
+                            text: "Erro ao carregar os dados."
+                        });
+                    }
+                });
+            });
+
+            $('#editModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+
+                // Carregar o conteúdo da modal
+                $.ajax({
+                    url: baseUrl + '/stock-edit/' + id,
+                    type: 'GET',
+                    success: function (data) {
+                        modal.find('.modal-body').html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erro ao carregar modal de edição:', xhr.responseText);
+                        Swal.fire({
+                            allowOutsideClick: false,
+                            icon: "error",
+                            title: "Erro ao carregar formulário",
+                            text: "Não foi possível carregar o formulário de edição. " + (xhr.responseText || error)
+                        });
+                    }
+                });
+
+                $('#EditSaveButton').off('click').on('click', function () {
+                    var form = $('#EditForm');
+                    if (!form.length) {
+                        console.error("Formulário #EditForm não encontrado.");
+                        toastr.error("Erro interno: Formulário de edição não encontrado.");
+                        return;
+                    }
+
+                    // 1. Obter o ID do produto a partir do campo 'hidden' no formulário
+                    // O asp-for="Id" gera um input com name="Id"
+                    var productId = form.find('input[name="Id"]').val();
+
+                    if (!productId) {
+                        toastr.error("Não foi possível encontrar o ID do produto. Ação cancelada.");
+                        return;
+                    }
+
+                    // 2. Obter os dados do formulário
+                    var formData = form.serialize();
+
+                    // 3. Construir o URL de POST com o ID, como o Controller espera
+                    var postUrl = baseUrl + '/stock-edit/' + productId;
+
+
+                    $.ajax({
+                        url: postUrl,
+                        type: 'POST',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                setTimeout(function () { location.reload(); }, 3000);
+                            } else {
+                                if (Array.isArray(response.errors)) {
+                                    response.errors.forEach(function (error) { toastr.error(error); });
+                                } else if (typeof response.errors === 'string') {
+                                    toastr.error(response.errors);
+                                } else {
+                                    toastr.error('Ocorreu um erro desconhecido!');
+                                }
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                             // Adiciona isto para ver o 404 de forma mais clara
+                            console.error("Erro no POST:", xhr.responseText);
+                            toastr.error('Erro ao processar o pedido! (Status: ' + xhr.status + ')');
+                        }
+                    });
+                });
+            });
+
+            // DELETE
+            $(document).on('click', '.btn-delete', function () {
+                var button = $(this);
+                var id = button.data('id');
+                var name = button.data('name'); // Corrigido para ler o data-name
+
+                Swal.fire({
+                    title: 'Tem certeza que deseja cancelar desativar este produto?',
+                    text: `Produto: ${name}`, // Agora 'name' deve ter o valor correto
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Não',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Aguarde...',
+                            text: 'Processando o cancelamento.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.ajax({
+                            url: baseUrl + '/stock-delete/' + id,
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    toastr.success(response.message);
+                                    setTimeout(function () { location.reload(); }, 3000);
+                                } else {
+                                    if (Array.isArray(response.errors)) {
+                                        response.errors.forEach(function (error) { toastr.error(error); });
+                                    } else if (typeof response.errors === 'string') {
+                                        toastr.error(response.errors);
+                                    } else {
+                                        toastr.error('Não foi possível obter o erro do backend!');
+                                    }
+                                }
+                                Swal.close();
+                            },
+                            error: function () {
+                                Swal.close();
+                                toastr.error('Ocorreu um erro ao processar o pedido!');
+                            }
+                        });
+                    }
+                });
+            });
+
+            function applyFilters() {
+                var productFilter = $('#filterProduct').val();
+                var nameFilter = $('#filterName').val().toLowerCase();
+                var statusFilter = $('#filterIsActive').val();
+
+                $('.product-card').each(function () {
+                    var card = $(this);
+                    var productId = card.data('product-id').toString();
+                    var stockRef = card.data('ref').toString().toLowerCase();
+                    var stockStatus = card.data('stock-status').toString();
+
+                    var showCard = true;
+
+                    if (productFilter && productId !== productFilter) {
+                        showCard = false;
+                    }
+
+                    if (nameFilter && !stockRef.includes(nameFilter)) {
+                        showCard = false;
+                    }
+
+                    if (statusFilter && stockStatus !== statusFilter) {
+                        showCard = false;
+                    }
+
+                    card.toggle(showCard);
+                });
+            }
+
+        $('#filterProduct').on('change', applyFilters);
+        $('#filterName').on('input', applyFilters);
+        $('#filterIsActive').on('change', applyFilters);
+
+        });
+    </script>
+}

@@ -1,0 +1,116 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.OrderViewModel
+
+@{
+    ViewData["Title"] = "Criar Pedido";
+    bool isMachine = Model.Stock?.Product?.Type == LojaMaquinas.Business.Models.Enums.ProductType.Machine;
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Criar Pedido</h3>
+
+    <form id="OrderCreateForm">
+
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="StockId" />
+        <input type="hidden" asp-for="ClientId" />
+        <input type="hidden" asp-for="OrderDate" />
+        <input type="hidden" asp-for="Status" value="0" />
+
+        <!-- Product Info -->
+        <div class="mb-3">
+            <label class="form-label"><strong>Produto</strong></label>
+            <input type="text" class="form-control" value="@Model.Stock?.Product?.Name" disabled />
+        </div>
+
+        <!-- Order Type -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Tipo de Pedido</label>
+
+            @if (isMachine)
+            {
+                <select id="OrderType" asp-for="Type" class="form-control">
+                    <option value="0">Venda</option>
+                    <option value="1">Aluguer</option>
+                </select>
+            }
+            else
+            {
+                <input type="hidden" asp-for="Type" value="0" />
+                <input class="form-control" value="Venda" disabled />
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success px-4">
+            <i class="fa-solid fa-check me-2"></i>Confirmar Pedido
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary px-4 ms-2">Cancelar</a>
+
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            var form = $('#OrderCreateForm');
+            var urlPost = '@Url.Action("Create", "Order")';
+
+            toastr.options = {
+                positionClass: 'toast-top-right',
+                closeButton: true,
+                progressBar: true,
+                timeOut: 3000
+            };
+
+            form.on('submit', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Confirmar Pedido',
+                    text: 'Deseja confirmar o pedido?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        $.ajax({
+                            url: urlPost,
+                            type: 'POST',
+                            data: form.serialize(),
+                            success: function (response) {
+                                if (response.success) {
+
+                                    var orderType = $('#OrderType').val();
+
+                                    if (orderType == "1") {
+                                        window.location.href = '/orderrent-create/' + response.orderId;
+                                    }
+                                    else {
+                                        window.location.href = '/order-checkout/' + response.orderId;
+                                    }
+
+                                } else {
+                                    toastr.error('Erro ao criar o pedido!');
+                                }
+                            },
+                            error: function () {
+                                toastr.error('Erro no servidor!');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

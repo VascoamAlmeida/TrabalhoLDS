@@ -1,0 +1,96 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.StockViewModel
+
+@{
+    ViewData["Title"] = "Novo Item de Stock";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    @if (ViewBag.Products != null && ((IEnumerable<dynamic>)ViewBag.Products).Any())
+    {
+        <form id="CreateForm" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row mb-3">
+                <!-- Referência -->
+                <div class="col-md-6">
+                    <label asp-for="Ref" class="form-label fw-semibold">Referência de Stock</label>
+                    <input asp-for="Ref" class="form-control rounded-2 p-2"
+                           placeholder="Digite a referência do item de stock" />
+                    <span asp-validation-for="Ref" class="text-danger"></span>
+                </div>
+
+                <!-- Produto -->
+                <div class="col-md-6">
+                    <label asp-for="ProductId" class="form-label fw-semibold">Produto</label>
+                    <select asp-for="ProductId" class="form-select rounded-2 p-2">
+                        <option value="">-- Selecione um Produto --</option>
+                        @foreach (var product in ViewBag.Products)
+                        {
+                            <option value="@product.Id">@product.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProductId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <!-- Estado -->
+                <div class="col-md-4">
+                    <label asp-for="StockStatus" class="form-label fw-semibold">Estado</label>
+                    <select asp-for="StockStatus" class="form-select rounded-2 p-2">
+                        <option value="">-- Selecione o estado --</option>
+                        <option value="0">Disponível</option>
+                        <option value="2">Indisponível</option>
+                    </select>
+                    <span asp-validation-for="StockStatus" class="text-danger"></span>
+                </div>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Sem Produtos Disponíveis</h5>
+            <p class="mb-0">
+                Não existem produtos disponíveis para criar itens de stock.
+                <br />
+                Por favor, crie primeiro um produto no sistema.
+            </p>
+        </div>
+    }
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    .alert-warning {
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

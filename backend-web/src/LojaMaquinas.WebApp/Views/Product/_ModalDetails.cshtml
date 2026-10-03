@@ -1,0 +1,58 @@
+﻿<!-- _ModalDetails.cshtml -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 900px;">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header text-white rounded-top" style="background-color: #1e3a5f;">
+                <h5 class="modal-title fw-bold" id="detailsModalLabel">
+                    <i class="fas fa-info-circle me-2"></i>Detalhes de Produto
+                </h5>
+                <button type="button" class="close btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4" style="max-height: 80vh; overflow-y: auto;">
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-light rounded-bottom d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">
+                    <i class="fas fa-times"></i>&nbsp;&nbsp;&nbsp;Fechar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .modal-footer button {
+        min-width: 130px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f1f1f1;
+    }
+</style>

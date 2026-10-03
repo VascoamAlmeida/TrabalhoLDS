@@ -1,0 +1,121 @@
+﻿@using LojaMaquinas.Business.Models.Enums
+@model LojaMaquinas.WebApp.ViewModels.MVC.OrderRent.OrderRentViewModel
+
+@{
+    ViewData["Title"] = "Editar Aluguer";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color:#1e3a5f;">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>Editar Aluguer
+                    </h5>
+                    <small class="text-white-50">ID: @Model.Id</small>
+                </div>
+
+                <form asp-action="Edit"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="card-body p-4">
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="OrderId" />
+                        <input type="hidden" asp-for="CompanyImage" />
+                        <input type="hidden" asp-for="UserImage" />
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="InitialDate" class="form-label fw-semibold text-muted">
+                                    <i class="fas fa-calendar-day text-primary me-1"></i>Data de Início
+                                </label>
+                                <input asp-for="InitialDate" type="date" class="form-control" readonly />
+                                <span asp-validation-for="InitialDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="EndDate" class="form-label fw-semibold text-muted">
+                                    <i class="fas fa-calendar-check text-success me-1"></i>Data de Fim
+                                </label>
+                                <input asp-for="EndDate" type="date" class="form-control" readonly />
+                                <span asp-validation-for="EndDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label fw-semibold text-muted">
+                                <i class="fas fa-info-circle text-warning me-1"></i>Estado
+                            </label>
+                            <select asp-for="Status"
+                                    class="form-select"
+                                    asp-items="Html.GetEnumSelectList<OrderRentStatus>()">
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3" id="userPhotoGroup"
+                             style="display:@(Model.Status == OrderRentStatus.Completed ? "block" : "none")">
+                            <label class="form-label fw-semibold text-muted">
+                                <i class="fas fa-camera text-info me-1"></i>Foto do utilizador (para concluir)
+                            </label>
+                            <input type="file" name="userPhoto" class="form-control" />
+                            <small class="text-muted d-block mt-1">
+                                Apenas necessária quando o aluguer é marcado como <strong>Concluído</strong>.
+                            </small>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                    </div>
+
+                    <div class="card-footer bg-light border-0 d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+        <script>
+        (function () {
+            const statusSelect = document.getElementById("Status");
+            const userPhotoGroup = document.getElementById("userPhotoGroup");
+            const completedValue = "@((int)OrderRentStatus.Completed)";
+
+            function toggleUserPhoto() {
+                if (statusSelect.value === completedValue) {
+                    userPhotoGroup.style.display = "block";
+                } else {
+                    userPhotoGroup.style.display = "none";
+                }
+            }
+
+            statusSelect.addEventListener("change", toggleUserPhoto);
+            toggleUserPhoto(); 
+        })();
+    </script>
+
+}
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+    }
+</style>

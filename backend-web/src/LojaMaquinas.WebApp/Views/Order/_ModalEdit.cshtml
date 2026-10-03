@@ -1,0 +1,63 @@
+﻿<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 900px;">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+
+            <div class="modal-header text-white rounded-top" style="background-color: #1e3a5f;">
+                <h5 class="modal-title fw-bold" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i>Editar Pedido
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+                <!-- Conteúdo será carregado aqui via AJAX -->
+            </div>
+
+            <div class="modal-footer bg-light rounded-bottom d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>&nbsp;&nbsp;&nbsp;Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary px-4" id="EditSaveButton">
+                    <i class="fas fa-save"></i>&nbsp;&nbsp;&nbsp;Guardar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    #editModal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    #editModal .modal-header {
+        border-bottom: none;
+    }
+
+    #editModal .modal-footer {
+        border-top: none;
+    }
+
+    #editModal .modal-footer button {
+        min-width: 130px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+
+    #editModal .btn-primary {
+        background-color: #0099cc;
+        border-color: #0099cc;
+    }
+
+    #editModal .btn-primary:hover {
+        background-color: #007aa3;
+        border-color: #007aa3;
+    }
+
+    #editModal .btn-outline-secondary:hover {
+        background-color: #f1f1f1;
+    }
+</style>

@@ -1,0 +1,73 @@
+@model IEnumerable<LojaMaquinas.WebApp.ViewModels.MVC.MaintenanceViewModel>
+
+<table id="MaintenanceTable" class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width:15%">
+                @Html.DisplayNameFor(model => model.ScheduledDate)
+            </th>
+            <th style="width:10%">
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th style="width:35%">
+                @Html.DisplayNameFor(model => model.Obs)
+            </th>
+            <th style="width:15%">
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th style="width:15%">
+                Pedido
+            </th>
+            <th style="width:10%"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
+                </td>
+                <td>
+                    @item.Price.ToString("C")
+                </td>
+                <td>
+                    @(item.Obs?.Length > 50 ? item.Obs.Substring(0, 50) + "..." : item.Obs)
+                </td>
+                <td>
+                    @if (item.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Pending)
+                    {
+                        <span class="badge bg-info">Pendente</span>
+                    }
+                    else if (item.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.InProgress)
+                    {
+                        <span class="badge bg-warning">Em Andamento</span>
+                    }
+                    else if (item.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Completed)
+                    {
+                        <span class="badge bg-success">Concluído</span>
+                    }
+                    else if (item.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Cancelled)
+                    {
+                        <span class="badge bg-danger">Cancelado</span>
+                    }
+                </td>
+                <td>
+                    @if (item.Order != null)
+                    {
+                        <span class="badge bg-secondary">Pedido #@item.Order.Id.ToString().Substring(0, 8)</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">N/D</span>
+                    }
+                </td>
+                <td class="text-right">
+                    <a class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal" data-id="@item.Id" style="padding: 2px 6px; font-size: 0.75rem;"><spam class="fa fa-search"></spam></a>
+                    <a class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editModal" data-id="@item.Id" style="padding: 2px 6px; font-size: 0.75rem;"><spam class="fa fa-pencil-alt"></spam></a>
+                    <a class="btn btn-outline-danger btn-sm" data-toggle="modal" data-id="@item.Id" data-name="@item.ScheduledDate.ToString("dd/MM/yyyy")" style="padding: 2px 6px; font-size: 0.75rem;"><spam class="fa fa-trash"></spam></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

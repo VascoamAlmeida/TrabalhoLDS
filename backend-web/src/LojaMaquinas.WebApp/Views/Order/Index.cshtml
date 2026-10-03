@@ -1,0 +1,777 @@
+@model IEnumerable<OrderViewModel>
+
+@{
+    ViewData["Title"] = "Histórico de Pedidos";
+    ViewData["CurrentPage"] = "HistoricoPedidos";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+<div class="transaction-container">
+    <h1 class="page-title">Histórico de Pedidos</h1>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label class="filter-label">Tipo de Pedido</label>
+                <select class="filter-select" id="filterType">
+                    <option value="">Todos</option>
+                    <option value="sale">Venda</option>
+                    <option value="rent">Aluguer</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Estado</label>
+                <select class="filter-select" id="filterStatus">
+                    <option value="">Todos</option>
+                    <option value="pending">Pendente</option>
+                    <option value="active">Ativo</option>
+                    <option value="completed">Concluído</option>
+                    <option value="cancelled">Cancelado</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction List -->
+    <div class="transaction-list" id="orderList">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var order in Model)
+            {
+                var statusClass = order.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Completed ? "completed" :
+                                  order.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Active ? "active" :
+                                  order.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Cancelled ? "cancelled" : "pending";
+                var statusText = order.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Completed ? "Concluído" :
+                                 order.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Active ? "Ativo" :
+                                 order.Status == LojaMaquinas.Business.Models.Enums.OrderStatus.Cancelled ? "Cancelado" : "Pendente";
+
+                var typeClass = order.Type == LojaMaquinas.Business.Models.Enums.OrderType.Sale ? "sale" : "rent";
+                var typeText = order.Type == LojaMaquinas.Business.Models.Enums.OrderType.Sale ? "Venda" : "Aluguer";
+                var iconClass = order.Type == LojaMaquinas.Business.Models.Enums.OrderType.Sale ? "fa-tag" : "fa-calendar";
+
+                <div class="transaction-card" data-status="@statusClass" data-type="@typeClass" data-id="@order.Id" data-toggle="modal"
+                     data-target="#detailsModal">
+                    <div class="card-icon-wrapper @typeClass">
+                        <i class="fas @iconClass"></i>
+                    </div>
+
+                    <div class="card-main-content">
+                        <div class="card-header">
+                            <span class="transaction-title">@typeText #@order.Id.ToString().Substring(0, 5).ToUpper()</span>
+                        </div>
+                        <div class="transaction-date">@order.OrderDate.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-PT"))</div>
+
+                        <div class="card-details">
+                            <div class="detail-line">
+                                <strong>Máquina:</strong> @(order.Stock != null && order.Stock.Product != null ? order.Stock.Product.Name : "N/A")
+                            </div>
+                            <div class="detail-line">
+                                <strong>Cliente:</strong> @(order.Client != null ? order.Client.FirstName + (order.Client.LastName != null ? " " + order.Client.LastName : "") : "N/A")
+                            </div>
+                            @if (order.Type == LojaMaquinas.Business.Models.Enums.OrderType.Rent)
+                            {
+                                <div class="detail-line">
+                                    <strong>Período:</strong> @order.OrderDate.ToString("dd/MM/yyyy") - @order.OrderDate.AddDays(30).ToString("dd/MM/yyyy")
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-right-section">
+                        <div class="transaction-amount">@order.Total.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))</div>
+                        <div class="status-badge @statusClass">@statusText</div>
+                    </div>
+                    <div class="card-actions">
+                        @if (order.Type == LojaMaquinas.Business.Models.Enums.OrderType.Sale)
+                        {
+                            <button class="btn-action btn-pdf" onclick="downloadPdf(event, '@order.Id')" title="Descarregar PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn-action btn-pdf" onclick="downloadRentPdf(event, '@order.Id')" title="Descarregar PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                        }
+
+                        @if (User.IsInRole("CLIENT"))
+                        {
+                            <button class="btn-action btn-cancel-order" onclick="cancelOrder(event, '@order.Id')" title="Cancelar Pedido">
+                                <i class="fas fa-ban"></i>
+                            </button>                            
+                            <button class="btn-action btn-delete" onclick="deleteOrder(event, '@order.Id')" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn-action btn-complete-order" onclick="completeOrder(event, '@order.Id')" title="Completar Pedido">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-receipt"></i>
+                <p>Nenhuma transação encontrada</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal Area -->
+<partial name="_ModalDetails" />
+<partial name="_ModalEdit" />
+
+<style>
+    .transaction-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 30px;
+    }
+
+    .filters-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    .filters-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 6px;
+    }
+
+    .filter-select,
+    .filter-input {
+        padding: 10px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: #f8f9fa;
+        transition: all 0.3s;
+    }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: #0099cc;
+            background-color: white;
+        }
+
+    .transaction-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .transaction-card {
+        background-color: #f5f5f5;
+        border-radius: 12px;
+        padding: 24px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: flex-start;
+        transition: background-color 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        position: relative;
+    }
+
+        .transaction-card:hover {
+            background-color: #ececec;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+    .card-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .card-icon-wrapper.sale {
+            background-color: #d6eaf8;
+            color: #2980b9;
+        }
+
+        .card-icon-wrapper.rent {
+            background-color: #d6eaf8;
+            color: #2980b9;
+        }
+
+        .card-icon-wrapper i {
+            font-size: 22px;
+        }
+
+    .card-main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .card-header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .transaction-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #2c3e50;
+        line-height: 1.3;
+    }
+
+    .transaction-date {
+        font-size: 13px;
+        color: #7f8c8d;
+        font-weight: 400;
+    }
+
+    .card-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .detail-line {
+        font-size: 14px;
+        color: #5a6c7d;
+        line-height: 1.4;
+    }
+
+        .detail-line strong {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+    .card-right-section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .transaction-amount {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        padding: 5px 14px;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+        .status-badge.completed {
+            background-color: #d4edda;
+            color: #28a745;
+        }
+
+        .status-badge.active {
+            background-color: #fff3cd;
+            color: #ffc107;
+        }
+
+        .status-badge.pending {
+            background-color: #ffe5cc;
+            color: #fd7e14;
+        }
+
+        .status-badge.cancelled {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #999;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+    .card-actions {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+    }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+
+    .btn-edit {
+        background-color: #0099cc;
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background-color: #007aa3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 153, 204, 0.3);
+        }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+    .btn-pdf {
+        background-color: #28a745;
+        color: white;
+    }
+
+        .btn-pdf:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+    .btn-cancel-order {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+        .btn-cancel-order:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
+
+    .btn-complete-order {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+        .btn-complete-order:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+        }
+</style>
+
+@section Scripts {
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        toastr.options = {
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            extendedTimeOut: 3000,
+            showDuration: 300,
+            hideDuration: 300,
+        }
+
+        $(document).ready(function () {
+            var baseUrl = '@Url.Content("~")';
+
+            // DETAILS MODAL - Ao clicar no card
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+
+                $.ajax({
+                    url: baseUrl + '/order-details/' + id,
+                    type: 'GET',
+                    success: function (data) {
+                        modal.find('.modal-body').html(data);
+                    },
+                    error: function () {
+
+                        Swal.fire({
+                            allowOutsideClick: false,
+                            icon: "error",
+                            text: "Erro ao carregar os dados."
+                        });
+                    }
+                });
+            });
+
+            // FILTROS
+            function applyFilters() {
+                var statusFilter = $('#filterStatus').val().toLowerCase();
+                var typeFilter = $('#filterType').val().toLowerCase();
+                var dateFilter = $('#filterDate').val();
+
+                $('.transaction-card').each(function() {
+                    var card = $(this);
+                    var status = card.attr('data-status');
+                    var type = card.attr('data-type');
+                    var dateText = card.find('.transaction-date').text();
+
+                    var showCard = true;
+
+                    // Filtro de status
+                    if (statusFilter && status !== statusFilter) {
+                        showCard = false;
+                    }
+
+                    // Filtro de tipo
+                    if (typeFilter && type !== typeFilter) {
+                        showCard = false;
+                    }
+
+                    // Filtro de data
+                    if (dateFilter) {
+                        var filterDate = new Date(dateFilter);
+                        // Implementação pode ser melhorada
+                    }
+
+                    if (showCard) {
+                        card.show();
+                    } else {
+                        card.hide();
+                    }
+                });
+            }
+
+            $('#filterStatus').on('change', applyFilters);
+            $('#filterType').on('change', applyFilters);
+            $('#filterDate').on('change', applyFilters);
+
+            // Handler para o botão de guardar do modal de edição
+            $('#EditSaveButton').on('click', function (e) {
+                e.preventDefault();
+
+                var formData = {
+                    Id: $('#editOrderForm #Id').val(),
+                    ClientId: $('#editOrderForm #ClientId').val(),
+                    StockId: $('#editOrderForm #StockId').val(),
+                    OrderDate: $('#editOrderForm #OrderDate').val(),
+                    Total: $('#editOrderForm #Total').val(),
+                    Type: $('#editOrderForm #Type').val(),
+                    Status: $('#editOrderForm #Status').val()
+                };
+
+                // Validar se os IDs estão preenchidos
+                if (!formData.ClientId || !formData.StockId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro!',
+                        text: 'Dados do pedido inválidos. Por favor, tente novamente.'
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Content("~")' + '/order-edit/' + formData.Id,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#editModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            var errorMsg = response.error || (response.errors && response.errors.length > 0 ? response.errors.join('<br>') : 'Erro ao atualizar o pedido.');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                html: errorMsg
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro!',
+                            text: 'Erro ao atualizar o pedido.'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Função para descarregar PDF
+        function downloadPdf(event, orderId) {
+            event.stopPropagation(); // Prevenir abertura do modal
+            event.preventDefault();
+
+            // Abrir PDF em nova aba
+            window.open('@Url.Content("~")' + orderId + '/download-pdf');
+        }
+
+        // Função para descarregar PDF
+        function downloadRentPdf(event, orderId) {
+            event.stopPropagation(); // Prevenir abertura do modal
+            event.preventDefault();
+
+            // Abrir PDF em nova aba
+            window.open('@Url.Content("~")' + orderId + '/download-pdf');
+        }
+
+        // Função para editar order
+        function editOrder(event, orderId) {
+            event.stopPropagation(); // Prevenir abertura do modal
+            event.preventDefault();
+
+            // Carregar conteúdo no modal via AJAX
+            $.ajax({
+                url: '@Url.Content("~")' + '/order-edit/' + orderId,
+                type: 'GET',
+                success: function (data) {
+                    $('#editModal .modal-body').html(data);
+                    $('#editModal').modal('show');
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro!',
+                        text: 'Erro ao carregar os dados do pedido.'
+                    });
+                }
+            });
+        }
+
+        // Função para cancelar order
+        function cancelOrder(event, orderId) {
+            event.stopPropagation(); // Prevenir abertura do modal
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Cancelar Pedido?',
+                text: "Tem a certeza que deseja cancelar este pedido?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, cancelar!',
+                cancelButtonText: 'Não'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Content("~")' + '/order-cancel/' + orderId,
+                        type: 'PATCH',
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Cancelado!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    // Recarregar a página para atualizar o estado
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro!',
+                                    text: response.error || 'Erro ao cancelar o pedido.'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: 'Erro ao cancelar o pedido.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Função para completar order
+        function completeOrder(event, orderId) {
+            event.stopPropagation(); // Prevenir abertura do modal
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Completar Pedido?',
+                text: "Tem a certeza que deseja marcar este pedido como concluído?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#17a2b8',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, completar!',
+                cancelButtonText: 'Não'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Content("~")' + '/order-complete/' + orderId,
+                        type: 'PATCH',
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Concluído!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    // Recarregar a página para atualizar o estado
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro!',
+                                    text: response.error || 'Erro ao completar o pedido.'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: 'Erro ao completar o pedido.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Função para eliminar order
+        function deleteOrder(event, orderId) {
+            event.stopPropagation(); // Prevenir abertura do modal
+            event.preventDefault();
+
+            // Verificar se o estado é "cancelled"
+            var orderCard = $('[data-id="' + orderId + '"]');
+            var orderStatus = orderCard.attr('data-status');
+
+            if (orderStatus !== 'cancelled') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Não permitido!',
+                    text: 'Apenas pedidos cancelados podem ser eliminados.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Tem a certeza?',
+                text: "Esta ação não pode ser revertida!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, eliminar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Content("~")' + '/order-delete/' + orderId,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Eliminado!',
+                                    text: 'O pedido foi eliminado com sucesso.',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+
+                                // Remover o card da lista
+                                $('[data-id="' + orderId + '"]').fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro!',
+                                    text: response.error || 'Erro ao eliminar o pedido.'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: 'Erro ao eliminar o pedido.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

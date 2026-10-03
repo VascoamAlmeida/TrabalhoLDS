@@ -1,0 +1,539 @@
+@model IEnumerable<LojaMaquinas.WebApp.ViewModels.MVC.MaintenanceViewModel>
+
+@{
+    ViewData["Title"] = "Histórico Manutenções";
+    ViewData["CurrentPage"] = "HistoricoManutencoes";
+}
+
+<style>
+        .maintenance-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .filters-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .filter-select,
+        .filter-input {
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: #0099cc;
+            background-color: white;
+        }
+
+        .btn-add-maintenance {
+            padding: 10px 20px;
+            background-color: #0099cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-add-maintenance:hover {
+            background-color: #007aa3;
+            transform: translateY(-1px);
+        }
+
+        .maintenance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .maintenance-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .maintenance-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .card-icon.pending {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .card-icon.inprogress {
+            background-color: #ffe5d0;
+            color: #d97a29;
+        }
+
+        .card-icon.completed {
+            background-color: #d1f2eb;
+            color: #0aa078;
+        }
+
+        .card-icon i {
+            font-size: 22px;
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .maintenance-type {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .maintenance-date {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .maintenance-machine {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .maintenance-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-badge.completed {
+            background-color: #d1f2eb;
+            color: #0aa078;
+        }
+
+        .status-badge.inprogress {
+            background-color: #ffe5d0;
+            color: #d97a29;
+        }
+
+        .status-badge.pending {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-action {
+            padding: 6px 14px;
+            border: 1px solid #dee2e6;
+            background-color: white;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn-edit {
+            color: #0099cc;
+            border-color: #0099cc;
+        }
+
+        .btn-edit:hover {
+            background-color: #e7f3f8;
+        }
+
+        .btn-delete {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: #fff5f5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        @@media (max-width: 768px) {
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+
+            .maintenance-card {
+                flex-direction: column;
+            }
+
+            .card-header-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+</style>
+
+<div class="maintenance-container">
+        <h1 class="page-title">Histórico Manutenções</h1>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select" id="filterStatus">
+                        <option value="">Todos</option>
+                        <option value="pending">Pendente</option>
+                        <option value="inprogress">Em Andamento</option>
+                        <option value="completed">Concluído</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Data</label>
+                    <input type="date" class="filter-input" id="filterDate" />
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Pesquisar</label>
+                    <input type="text" class="filter-input" id="filterSearch" placeholder="Pesquisar observações..." />
+                </div>
+
+                <button class="btn-add-maintenance" data-toggle="modal" data-target="#createModal">
+                    <i class="fas fa-plus me-2"></i>Nova Manutenção
+                </button>
+            </div>
+        </div>
+
+        <!-- Maintenance List -->
+        <div class="maintenance-list" id="maintenanceList">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var maintenance in Model)
+                {
+                    var statusClass = maintenance.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Completed ? "completed" :
+                                      maintenance.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.InProgress ? "inprogress" : "pending";
+                    var statusText = maintenance.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Completed ? "Concluído" :
+                                     maintenance.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.InProgress ? "Em Andamento" : "Pendente";
+
+                    <div class="maintenance-card" data-status="@statusClass">
+                        <div class="card-icon @statusClass">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-header-row">
+                                <div>
+                                    <div class="maintenance-type">Manutenção</div>
+                                    <div class="maintenance-date">@maintenance.ScheduledDate.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-PT"))</div>
+                                </div>
+                                <div class="status-badge @statusClass">@statusText</div>
+                            </div>
+                            <div class="maintenance-machine">
+                                <strong>Preço:</strong> @maintenance.Price.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))
+                            </div>
+                            <div class="maintenance-description">
+                                <strong>Observações:</strong> @(string.IsNullOrEmpty(maintenance.Obs) ? "Sem observações" : maintenance.Obs)
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-action" data-toggle="modal" data-target="#detailsModal" data-id="@maintenance.Id">
+                                    <i class="fas fa-eye me-1"></i>Detalhes
+                                </button>
+                                <button class="btn-action btn-delete" data-id="@maintenance.Id" data-name="@maintenance.ScheduledDate.ToString("dd/MM/yyyy")">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhuma manutenção encontrada</p>
+                </div>
+            }
+        </div>
+    </div>
+
+<!-- Modal Area -->
+<partial name="_ModalCreate" />
+<partial name="_ModalDetails" />
+
+@section Scripts {
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        toastr.options = {
+            positionClass: 'toast-top-right',
+            preventDuplicates: true,
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            extendedTimeOut: 3000,
+            showDuration: 300,
+            hideDuration: 300,
+        }
+
+        $(document).ready(function () {
+            var baseUrl = '@Url.Content("~")';
+
+            // CREATE MODAL
+            $('#createModal').on('show.bs.modal', function (event) {
+                var modal = $(this);
+                $.ajax({
+                    url: baseUrl + '/maintenance-create/',
+                    type: 'GET',
+                    success: function (data) {
+                        modal.find('.modal-body').html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erro ao carregar modal de criação:', xhr.responseText);
+                        Swal.fire({
+                            allowOutsideClick: false,
+                            icon: "error",
+                            title: "Erro ao carregar formulário",
+                            text: "Não foi possível carregar o formulário de criação. " + (xhr.responseText || error)
+                        });
+                    }
+                });
+
+                $('#CreateSaveButton').off('click').on('click', function () {
+                    var form = $('#CreateForm');
+                    var formData = form.serialize();
+
+                    $.ajax({
+                        url: baseUrl + '/maintenance-create/',
+                        type: 'POST',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                setTimeout(function () { location.reload(); }, 3000);
+                            } else {
+                                if (Array.isArray(response.errors)) {
+                                    response.errors.forEach(function (error) { toastr.error(error); });
+                                } else if (typeof response.errors === 'string') {
+                                    toastr.error(response.errors);
+                                } else {
+                                    toastr.error('Ocorreu um erro desconhecido!');
+                                }
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Erro ao processar o pedido!');
+                        }
+                    });
+                });
+            });
+
+            // DETAILS MODAL
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+
+                $.ajax({
+                    url: baseUrl + '/maintenance-details/' + id,
+                    type: 'GET',
+                    success: function (data) {
+                        modal.find('.modal-body').html(data);
+                    },
+                    error: function () {
+                        Swal.fire({
+                            allowOutsideClick: false,
+                            icon: "error",
+                            text: "Erro ao carregar os dados."
+                        });
+                    }
+                });
+            });
+
+            // DELETE
+            $(document).on('click', '.btn-delete', function () {
+                var button = $(this);
+                var id = button.data('id');
+                var name = button.data('name');
+
+                Swal.fire({
+                    title: 'Tem certeza que deseja cancelar esta manutenção?',
+                    text: `Manutenção: ${name}`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Não',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Aguarde...',
+                            text: 'Processando o cancelamento.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.ajax({
+                            url: baseUrl + '/maintenance-remove/' + id,
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    toastr.success(response.message);
+                                    setTimeout(function () { location.reload(); }, 3000);
+                                } else {
+                                    if (Array.isArray(response.errors)) {
+                                        response.errors.forEach(function (error) { toastr.error(error); });
+                                    } else if (typeof response.errors === 'string') {
+                                        toastr.error(response.errors);
+                                    } else {
+                                        toastr.error('Não foi possível obter o erro do backend!');
+                                    }
+                                }
+                                Swal.close();
+                            },
+                            error: function () {
+                                Swal.close();
+                                toastr.error('Ocorreu um erro ao processar o pedido!');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // FILTROS
+            function applyFilters() {
+                var statusFilter = $('#filterStatus').val().toLowerCase();
+                var dateFilter = $('#filterDate').val();
+                var searchFilter = $('#filterSearch').val().toLowerCase();
+
+                $('.maintenance-card').each(function() {
+                    var card = $(this);
+                    var status = card.attr('data-status');
+                    var dateText = card.find('.maintenance-date').text();
+                    var obsText = card.find('.maintenance-description').text().toLowerCase();
+
+                    var showCard = true;
+
+                    // Filtro de status
+                    if (statusFilter && status !== statusFilter) {
+                        showCard = false;
+                    }
+
+                    // Filtro de pesquisa (observações)
+                    if (searchFilter && !obsText.includes(searchFilter)) {
+                        showCard = false;
+                    }
+
+                    // Filtro de data (se implementado)
+                    if (dateFilter) {
+                        var filterDate = new Date(dateFilter);
+                        // Extrair data do texto do card e comparar
+                        // Implementação simples - pode ser melhorada
+                    }
+
+                    if (showCard) {
+                        card.show();
+                    } else {
+                        card.hide();
+                    }
+                });
+            }
+
+            $('#filterStatus').on('change', applyFilters);
+            $('#filterDate').on('change', applyFilters);
+            $('#filterSearch').on('input', applyFilters);
+        });
+    </script>
+}

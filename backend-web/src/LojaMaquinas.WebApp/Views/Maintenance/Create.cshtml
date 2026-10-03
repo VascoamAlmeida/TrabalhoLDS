@@ -1,0 +1,76 @@
+@model LojaMaquinas.WebApp.ViewModels.MVC.MaintenanceViewModel
+
+@{
+    ViewData["Title"] = "Nova Manutenção";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    @if (ViewBag.Orders != null && ((IEnumerable<dynamic>)ViewBag.Orders).Any())
+    {
+        <form id="CreateForm" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row mb-3">
+                <!-- Order -->
+                <div class="col-md-6">
+                    <label asp-for="OrderId" class="form-label fw-semibold">Pedido</label>
+                    <select asp-for="OrderId" class="form-select rounded-2">
+                        <option value="">-- Selecione um Pedido --</option>
+                        @foreach (var order in ViewBag.Orders)
+                        {
+                            <option value="@order.Id">Pedido #@order.Id.ToString().Substring(0, 8) - @order.Type</option>
+                        }
+                    </select>
+                    <span asp-validation-for="OrderId" class="text-danger"></span>
+                </div>
+
+            <!-- Scheduled Date -->
+            <div class="col-md-6">
+                <label asp-for="ScheduledDate" class="form-label fw-semibold">Data Agendada</label>
+                <input asp-for="ScheduledDate" type="datetime-local" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="ScheduledDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Price e Status são definidos automaticamente pelo sistema -->
+
+        <div class="row mb-3">
+            <!-- Observations -->
+            <div class="col-md-12">
+                <label asp-for="Obs" class="form-label fw-semibold">Observações</label>
+                <textarea asp-for="Obs" class="form-control rounded-2 p-2" rows="4" placeholder="Digite observações ou notas..."></textarea>
+                <span asp-validation-for="Obs" class="text-danger"></span>
+            </div>
+        </div>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Sem Pedidos Disponíveis</h5>
+            <p class="mb-0">
+                Não existem pedidos disponíveis para agendar manutenções.
+                <br />
+                Por favor, efetue primeiro uma compra ou aluguer de equipamento.
+            </p>
+        </div>
+    }
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,96 @@
+#Imagem base do Docker 
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+stages:
+  - build #  compila a solução
+  - unit-tests # corre testes unitarios
+  - integration-tests # corre testes de integração
+  - coverage-report # Faz cobertura e gera HTML
+
+# Variaveis globais
+variables:
+  # pasta do nuget que guarda packages
+  NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
+  GIT_DEPTH: "0"
+
+cache:
+  key: "nuget" # chave do cache
+  paths:
+    - .nuget/packages
+
+# JOB: build
+build:
+  stage: build
+  only:
+    - main
+    - dev
+  script:
+    # Vai buscar dependencias
+    - dotnet restore LojaMaquinas.sln
+    # Compila a solição
+    - dotnet build LojaMaquinas.sln -c Release --no-restore
+
+# unit-test
+unit-tests:
+  stage: unit-tests
+  only:
+    - main
+    - dev
+  script:
+      # Corre os testes unitários com cobertura
+      # grava ficheiro TRX com resultados
+      # pasta onde ficam TRX e outros artefactos
+      # ativa coverlet via MSBuild
+      # apresenta caminho  do ficheiro
+      # formato do relatório
+    - dotnet restore Tests/Tests.csproj
+    - dotnet test Tests/Tests.csproj -c Release --logger "trx;LogFileName=unit-tests.trx" --results-directory Tests/TestResults /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage.unit.xml /p:CoverletOutputFormat=opencover
+  artifacts:
+    when: always
+    paths:
+      - Tests/TestResults # guarda os resultados de testes
+    expire_in: 7 days
+
+# JOB: integration-tests
+integration-tests:
+  stage: integration-tests
+  only:
+    - main
+  script:
+      # Corre os testes integração com cobertura
+      # grava ficheiro TRX com resultados
+      # pasta onde ficam TRX e outros artefactos
+      # ativa coverlet via MSBuild
+      # apresenta caminho  do ficheiro
+      # formato do relatório
+    - dotnet restore IntegrationTests/IntegrationTests.csproj
+    - dotnet test IntegrationTests/IntegrationTests.csproj -c Release --logger "trx;LogFileName=integration-tests.trx" --results-directory IntegrationTests/TestResults /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage.integration.xml /p:CoverletOutputFormat=opencover
+
+  artifacts:
+    when: always
+    paths:
+      - IntegrationTests/TestResults # guarda os resultados de integração
+    expire_in: 7 days
+
+# JOB: coverage-report
+coverage-report:
+  stage: coverage-report
+  needs:
+    - unit-tests
+    - integration-tests
+  only:
+    - main
+  script:
+    # Instala o ReportGenerator
+    - dotnet tool install --global dotnet-reportgenerator-globaltool
+    # Adiciona a pasta das tools ao PATH para poderes usar o comando 'reportgenerator'
+    - export PATH="$PATH:/root/.dotnet/tools"
+    # Ver os ficheiros que vieram dos artifacts:
+    - ls -R
+    # Gera o relatório de cobertura combinando unit + integration
+    - reportgenerator -reports:"Tests/TestResults/coverage.unit.xml;IntegrationTests/TestResults/coverage.integration.xml" -targetdir:"coveragereport" -reporttypes:"Html;TextSummary" -assemblyfilters:"+LojaMaquinas.*;-Tests;-IntegrationTests;-FluentValidation*"
+  
+  artifacts:
+    paths:
+      - coveragereport
+    expire_in: 7 days

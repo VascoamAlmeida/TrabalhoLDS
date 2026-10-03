@@ -1,0 +1,84 @@
+@model LojaMaquinas.WebApp.ViewModels.MVC.MaintenanceViewModel
+
+@{
+    ViewData["Title"] = "Editar Manutenção";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    <form id="EditForm" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row mb-3">
+            <!-- Order -->
+            <div class="col-md-6">
+                <label asp-for="OrderId" class="form-label fw-semibold"></label>
+                <select asp-for="OrderId" class="form-select rounded-2">
+                    <option value="">-- Selecione o Pedido --</option>
+                    @if (ViewBag.Orders != null)
+                    {
+                        @foreach (var order in ViewBag.Orders)
+                        {
+                            <option value="@order.Id" selected="@(order.Id == Model.OrderId)">
+                                Pedido #@order.Id.ToString().Substring(0, 8) - @order.OrderType
+                            </option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="OrderId" class="text-danger"></span>
+            </div>
+
+            <!-- Scheduled Date -->
+            <div class="col-md-6">
+                <label asp-for="ScheduledDate" class="form-label fw-semibold"></label>
+                <input asp-for="ScheduledDate" type="datetime-local" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="ScheduledDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <!-- Price -->
+            <div class="col-md-6">
+                <label asp-for="Price" class="form-label fw-semibold"></label>
+                <input asp-for="Price" type="number" step="0.01" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-6">
+                <label asp-for="Status" class="form-label fw-semibold"></label>
+                <select asp-for="Status" class="form-select rounded-2" asp-items="Html.GetEnumSelectList<LojaMaquinas.Business.Models.Enums.MaintenanceStatus>()">
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <!-- Observations -->
+            <div class="col-md-12">
+                <label asp-for="Obs" class="form-label fw-semibold"></label>
+                <textarea asp-for="Obs" class="form-control rounded-2 p-2" rows="4"></textarea>
+                <span asp-validation-for="Obs" class="text-danger"></span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,69 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.StockViewModel
+
+@{
+    ViewData["Title"] = "Editar Produto";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    <form id="EditForm" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="Ref" class="form-label fw-semibold"></label>
+                <input asp-for="Ref" type="text" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Ref" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="StockStatus" class="form-label fw-semibold"></label>
+                <select asp-for="StockStatus" class="form-select rounded-2 p-2">
+                    <option value="1">Disponível</option>
+                    <option value="2">Indisponível</option>
+                    <option value="3">Vendido</option>
+                </select>
+                <span asp-validation-for="StockStatus" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label asp-for="ProductId" class="form-label fw-semibold"></label>
+                <select asp-for="ProductId" class="form-select rounded-2">
+                    <option value="">-- Selecione o Produto --</option>
+                    @if (ViewBag.Products != null)
+                    {
+                        @foreach (var product in ViewBag.Products)
+                        {
+                            <option value="@product.Id" selected="@(product.Id == Model.ProductId)">
+                                @product.Name
+                            </option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* O teu CSS original está ótimo */
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

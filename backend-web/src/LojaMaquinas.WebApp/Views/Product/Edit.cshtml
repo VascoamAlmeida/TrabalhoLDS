@@ -1,0 +1,125 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.ProductViewModel
+
+@{
+    ViewData["Title"] = "Editar Produto";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    <form id="EditForm" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="Name" class="form-label fw-semibold"></label>
+                <input asp-for="Name" type="text" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Brand" class="form-label fw-semibold"></label>
+                <input asp-for="Brand" type="text" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Brand" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="Model" class="form-label fw-semibold"></label>
+                <input asp-for="Model" type="text" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Model" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Type" class="form-label fw-semibold"></label>
+                <select asp-for="Type" class="form-select rounded-2" asp-items="Html.GetEnumSelectList<LojaMaquinas.Business.Models.Enums.ProductType>()">
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="Image" class="form-label fw-semibold"></label>
+                <input asp-for="Image" type="text" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="IsActive" class="form-label fw-semibold"></label>
+                <select asp-for="IsActive" class="form-select rounded-2 p-2">
+                    <option value="true">Ativo</option>
+                    <option value="false">Inativo</option>
+                </select>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label asp-for="CategoryId" class="form-label fw-semibold"></label>
+                <select asp-for="CategoryId" class="form-select rounded-2">
+                    <option value="">-- Selecione a Categoria --</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id" selected="@(category.Id == Model.CategoryId)">
+                                @category.Name
+                            </option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label asp-for="Price" class="form-label fw-semibold"></label>
+                <input asp-for="Price" type="number" step="0.01" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Quantity" class="form-label fw-semibold"></label>
+                <input asp-for="Quantity" type="number" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="YearManufacture" class="form-label fw-semibold"></label>
+                <input asp-for="YearManufacture" type="number" class="form-control rounded-2 p-2" />
+                <span asp-validation-for="YearManufacture" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label asp-for="Description" class="form-label fw-semibold"></label>
+                <textarea asp-for="Description" class="form-control rounded-2 p-2" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<style>
+    /* O teu CSS original está ótimo */
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

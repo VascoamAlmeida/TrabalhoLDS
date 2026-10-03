@@ -1,0 +1,51 @@
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 900px;">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+            <div class="modal-header text-white rounded-top" style="background-color: #1e3a5f;">
+                <h5 class="modal-title fw-bold" id="detailsModalLabel">
+                    <i class="fas fa-receipt me-2"></i>Detalhes da Transação
+                </h5>
+                <button type="button" class="close btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div id="detailsModalContent" class="text-center text-muted">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">A carregar detalhes...</p>
+                </div>
+            </div>
+
+            <div class="modal-footer bg-light rounded-bottom">
+                <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">
+                    <i class="fas fa-times"></i>&nbsp;&nbsp;&nbsp;Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #detailsModal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    #detailsModal .modal-header {
+        border-bottom: none;
+    }
+
+    #detailsModal .modal-footer {
+        border-top: none;
+    }
+
+    #detailsModal .modal-footer button {
+        min-width: 130px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+
+    #detailsModal .btn-outline-secondary:hover {
+        background-color: #f1f1f1;
+    }
+</style>

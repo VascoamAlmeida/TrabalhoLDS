@@ -1,0 +1,81 @@
+﻿<!-- _ModalEdit.cshtml -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 900px;">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-warning text-dark rounded-top">
+                <h5 class="modal-title fw-bold" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i>Editar Produto
+                </h5>
+                <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4" style="max-height: 80vh; overflow-y: auto;">
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-light rounded-bottom d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">
+                    <i class="fas fa-undo"></i>&nbsp;&nbsp;&nbsp;Voltar
+                </button>
+                <button type="submit" class="btn btn-warning px-4" id="EditSaveButton">
+                    <i class="fas fa-save"></i>&nbsp;&nbsp;&nbsp;Atualizar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .modal-footer button {
+        min-width: 130px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f1f1f1;
+    }
+
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

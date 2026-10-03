@@ -1,0 +1,90 @@
+@model LojaMaquinas.WebApp.ViewModels.MVC.MaintenanceViewModel
+
+@{
+    ViewData["Title"] = "Detalhes da Manutenção";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">ESTADO</label>
+            <p class="form-control-plaintext">
+                @if (Model.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Pending)
+                {
+                    <span class="badge bg-info fs-6">
+                        <i class="fas fa-calendar-alt me-1"></i>Pendente
+                    </span>
+                }
+                else if (Model.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.InProgress)
+                {
+                    <span class="badge bg-warning fs-6">
+                        <i class="fas fa-spinner me-1"></i>Em Andamento
+                    </span>
+                }
+                else if (Model.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Completed)
+                {
+                    <span class="badge bg-success fs-6">
+                        <i class="fas fa-check-circle me-1"></i>Concluído
+                    </span>
+                }
+                else if (Model.Status == LojaMaquinas.Business.Models.Enums.MaintenanceStatus.Cancelled)
+                {
+                    <span class="badge bg-danger fs-6">
+                        <i class="fas fa-times-circle me-1"></i>Cancelado
+                    </span>
+                }
+            </p>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">DATA MANUTENÇÃO</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-calendar text-primary me-2"></i>@Model.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label class="form-label fw-semibold text-muted">PREÇO</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-euro-sign text-success me-2"></i>@Model.Price.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label class="form-label fw-semibold text-muted">OBSERVAÇÕES</label>
+            <div class="border rounded-3 p-3 bg-light">
+                <p class="mb-0">
+                    @if (!string.IsNullOrWhiteSpace(Model.Obs))
+                    {
+                        @Model.Obs
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">Sem observações</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+    }
+
+    .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 8px 0;
+    }
+
+    .badge {
+        padding: 8px 15px;
+    }
+</style>

@@ -1,0 +1,151 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.Contracts.ContractViewModel
+
+@{
+    ViewData["Title"] = "Detalhes Contract ";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header text-white" style="background-color: #1e3a5f;">
+            <h4 class="mb-0">
+                <i class="fas fa-file-signature me-2"></i>Detalhes do Contrato
+            </h4>
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">ID DO CONTRATO</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-hashtag text-secondary me-2"></i>@Model.Id
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">ID DO ALUGUER</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-handshake text-info me-2"></i>@Model.OrderRentId
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">MÁQUINA</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-cogs text-warning me-2"></i>@Model.MachineName
+                        <span class="text-muted">(@Model.MachineModel)</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">DURAÇÃO</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-hourglass-half text-secondary me-2"></i>
+                        @Model.Duration dias
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">DATA INÍCIO</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-calendar-day text-primary me-2"></i>
+                        @Model.StartDate.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">DATA FIM</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-calendar-check text-success me-2"></i>
+                        @Model.EndDate.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">PREÇO DIÁRIO</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-euro-sign text-success me-2"></i>
+                        @Model.DailyPrice.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">TOTAL</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-coins text-warning me-2"></i>
+                        @Model.Total.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold text-muted">TERMOS E CONDIÇÕES</label>
+                    <div class="border rounded-3 p-3 bg-light" style="max-height: 250px; overflow-y: auto;">
+                        <p class="mb-0 text-justify">
+                            @Model.TermsConditions
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-3">
+                <i class="fas fa-user me-2"></i>Dados do Cliente
+            </h5>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">NOME</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-user-circle text-info me-2"></i>@Model.ClientName
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">EMAIL</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-envelope text-primary me-2"></i>@Model.ClientEmail
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">TELEFONE</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-phone text-success me-2"></i>@Model.ClientPhone
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-muted">MORADA</label>
+                    <p class="form-control-plaintext">
+                        <i class="fas fa-map-marker-alt text-danger me-2"></i>@Model.ClientAddress
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer bg-light">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i>&nbsp;Voltar à lista
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+    }
+
+    .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 8px 0;
+    }
+</style>

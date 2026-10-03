@@ -1,0 +1,165 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.ProductViewModel
+
+@{
+    ViewData["Title"] = "Novo Produto";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    @if (ViewBag.Categories != null && ((IEnumerable<dynamic>)ViewBag.Categories).Any())
+    {
+        <form id="CreateForm" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row mb-3">
+                <!-- Nome -->
+                <div class="col-md-6">
+                    <label asp-for="Name" class="form-label fw-semibold">Nome do Produto</label>
+                    <input asp-for="Name" class="form-control rounded-2 p-2" placeholder="Digite o nome do produto" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Categoria -->
+                <div class="col-md-6">
+                    <label asp-for="CategoryId" class="form-label fw-semibold">Categoria</label>
+                    <select asp-for="CategoryId" class="form-select rounded-2">
+                        <option value="">-- Selecione uma Categoria --</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <!-- Tipo -->
+                <div class="col-md-4">
+                    <label asp-for="Type" class="form-label fw-semibold">Tipo</label>
+                    <select asp-for="Type" class="form-select rounded-2">
+                        <option value="">-- Selecione o Tipo --</option>
+                        <option value="0">Máquina</option>
+                        <option value="1">Peça</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <!-- Marca -->
+                <div class="col-md-4">
+                    <label asp-for="Brand" class="form-label fw-semibold">Marca</label>
+                    <input asp-for="Brand" class="form-control rounded-2 p-2" placeholder="Digite a marca" />
+                    <span asp-validation-for="Brand" class="text-danger"></span>
+                </div>
+
+                <!-- Modelo -->
+                <div class="col-md-4">
+                    <label asp-for="Model" class="form-label fw-semibold">Modelo</label>
+                    <input asp-for="Model" class="form-control rounded-2 p-2" placeholder="Digite o modelo" />
+                    <span asp-validation-for="Model" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <!-- Ano de Fabrico -->
+                <div class="col-md-4">
+                    <label asp-for="YearManufacture" class="form-label fw-semibold">Ano de Fabrico</label>
+                    <input asp-for="YearManufacture" type="number" class="form-control rounded-2 p-2"
+                           min="1900" max="@DateTime.Now.Year" placeholder="Ex: 2023" />
+                    <span asp-validation-for="YearManufacture" class="text-danger"></span>
+                </div>
+
+                <!-- Preço -->
+                <div class="col-md-4">
+                    <label asp-for="Price" class="form-label fw-semibold">Preço (€)</label>
+                    <input asp-for="Price" type="number" step="0.01" class="form-control rounded-2 p-2"
+                           placeholder="0.00" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <!-- Quantidade -->
+                <div class="col-md-4">
+                    <label asp-for="Quantity" class="form-label fw-semibold">Quantidade Inicial</label>
+                    <input asp-for="Quantity" type="number" class="form-control rounded-2 p-2"
+                           min="0" placeholder="0" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <!-- Descrição -->
+                <div class="col-md-12">
+                    <label asp-for="Description" class="form-label fw-semibold">Descrição</label>
+                    <textarea asp-for="Description" class="form-control rounded-2 p-2" rows="4"
+                              placeholder="Descreva o produto detalhadamente..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <!-- Imagem -->
+                <div class="col-md-6">
+                    <label asp-for="Image" class="form-label fw-semibold">URL da Imagem</label>
+                    <input asp-for="Image" class="form-control rounded-2 p-2"
+                           placeholder="https://exemplo.com/imagem.jpg" />
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+
+                <!-- Estado Ativo -->
+                <div class="col-md-6">
+                    <div class="form-check mt-4 pt-2">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-semibold">Produto Ativo</label>
+                        <span asp-validation-for="IsActive" class="text-danger"></span>
+                    </div>
+                    <small class="form-text text-muted">Desmarque para desativar o produto temporariamente</small>
+                </div>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Sem Categorias Disponíveis</h5>
+            <p class="mb-0">
+                Não existem categorias disponíveis para criar produtos.
+                <br />
+                Por favor, crie primeiro uma categoria no sistema.
+            </p>
+        </div>
+    }
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+    .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    .alert-warning {
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+    }
+</style>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

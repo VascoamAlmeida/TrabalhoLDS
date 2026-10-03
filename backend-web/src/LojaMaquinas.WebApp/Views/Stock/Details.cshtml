@@ -1,0 +1,92 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.StockViewModel
+
+@{
+    ViewData["Title"] = "Detalhes do Item de Stock";
+    Layout = null;
+}
+
+<div class="col-md-12">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">Referência</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-tag text-primary me-2"></i>@Model.Ref
+            </p>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">Estado</label>
+            <p class="form-control-plaintext">
+                @if (Model.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.Available)
+                {
+                    <span class="badge bg-primary fs-6">
+                        <i class="fas fa-cogs me-1"></i>Disponível
+                    </span>
+                }
+                else if (Model.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.NotAvailable)
+                {
+                    <span class="badge bg-info fs-6">
+                        <i class="fas fa-cog me-1"></i>Indisponível
+                    </span>
+                }
+                else if (Model.StockStatus == LojaMaquinas.Business.Models.Enums.StockStatus.SoldOut)
+                {
+                    <span class="badge bg-info fs-6">
+                        <i class="fas fa-cog me-1"></i>Vendido
+                    </span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">Produto</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-folder text-warning me-2"></i>
+                @if (Model.Product != null)
+                {
+                    @Model.Product.Name
+                }
+                else
+                {
+                    <span class="text-muted">N/A</span>
+                }
+            </p>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted">Categoria</label>
+            <p class="form-control-plaintext">
+                <i class="fas fa-folder text-warning me-2"></i>
+                @if (Model.Product.Category != null)
+                {
+                    @Model.Product.Category.Name
+                }
+                else
+                {
+                    <span class="text-muted">N/A</span>
+                }
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-label.fw-semibold {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+    }
+
+    .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 8px 0;
+    }
+
+    .badge {
+        padding: 8px 15px;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>

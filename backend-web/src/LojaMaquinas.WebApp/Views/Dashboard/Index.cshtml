@@ -1,0 +1,353 @@
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["CurrentPage"] = "Dashboard";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" />
+
+<div class="dashboard-container">
+    <h1 class="page-title">Dashboard</h1>
+
+    <!-- Métricas principais -->
+    <div class="metrics-grid">
+        <!-- Vendas Mensais -->
+        <div class="metric-card large-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Vendas Mensais</h3>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">@Model.CurrentMonthRevenue.ToString("C0", new System.Globalization.CultureInfo("pt-PT"))</div>
+                <div class="metric-change @(Model.MonthlyRevenueChangePercent >= 0 ? "positive" : "negative")">
+                    <i class="fas @(Model.MonthlyRevenueChangePercent >= 0 ? "fa-arrow-up" : "fa-arrow-down")"></i>
+                    @Math.Abs(Model.MonthlyRevenueChangePercent).ToString("F0")%
+                    <span class="metric-period">Este Mês</span>
+                </div>
+            </div>
+            <div class="chart-container-small">
+                <canvas id="monthlyRevenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Alugueres Semanais -->
+        <div class="metric-card large-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Alugueres Semanais</h3>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">@Model.CurrentWeekRentals</div>
+                <div class="metric-change @(Model.WeeklyRentalsChangePercent >= 0 ? "positive" : "negative")">
+                    <i class="fas @(Model.WeeklyRentalsChangePercent >= 0 ? "fa-arrow-up" : "fa-arrow-down")"></i>
+                    @Math.Abs(Model.WeeklyRentalsChangePercent).ToString("F0")%
+                    <span class="metric-period">Esta Semana</span>
+                </div>
+            </div>
+            <div class="chart-container-small">
+                <canvas id="weeklyRentalsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock de Máquinas -->
+    <div class="stock-section">
+        <h3 class="section-title">Stock de Máquinas</h3>
+        <div class="stock-grid">
+            <div class="stock-card">
+                <div class="stock-label">Total de Máquinas</div>
+                <div class="stock-value">@Model.TotalMachines</div>
+            </div>
+            <div class="stock-card">
+                <div class="stock-label">Disponíveis</div>
+                <div class="stock-value available">@Model.AvailableMachines</div>
+            </div>
+            <div class="stock-card">
+                <div class="stock-label">Em Manutenção</div>
+                <div class="stock-value maintenance">@Model.MachinesInMaintenance</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 30px;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    .metric-card {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .metric-header {
+        margin-bottom: 20px;
+    }
+
+    .metric-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .metric-content {
+        margin-bottom: 24px;
+    }
+
+    .metric-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .metric-change {
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .metric-change.positive {
+        color: #10b981;
+    }
+
+    .metric-change.negative {
+        color: #ef4444;
+    }
+
+    .metric-change i {
+        font-size: 12px;
+    }
+
+    .metric-period {
+        font-weight: 400;
+        color: #64748b;
+        margin-left: 4px;
+    }
+
+    .chart-container-small {
+        height: 120px;
+        position: relative;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 20px;
+    }
+
+    .stock-section {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .stock-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .stock-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .stock-label {
+        font-size: 14px;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+
+    .stock-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .stock-value.available {
+        color: #10b981;
+    }
+
+    .stock-value.maintenance {
+        color: #f59e0b;
+    }
+
+    @@media (max-width: 992px) {
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stock-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Dados do modelo
+        var monthlyRevenueData = @Html.Raw(Json.Serialize(Model.MonthlyRevenueData));
+        var weeklyRentalsData = @Html.Raw(Json.Serialize(Model.WeeklyRentalsData));
+
+        // Configuração comum para os gráficos
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b';
+
+        // Gráfico de Vendas Mensais (Barras)
+        var monthlyRevenueCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        var monthlyRevenueChart = new Chart(monthlyRevenueCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(monthlyRevenueData),
+                datasets: [{
+                    label: 'Receita',
+                    data: Object.values(monthlyRevenueData),
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: 'rgba(59, 130, 246, 0.8)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return 'Receita: ' + context.parsed.y.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        display: false,
+                        beginAtZero: true,
+                        grid: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Alugueres Semanais (Linha)
+        var weeklyRentalsCtx = document.getElementById('weeklyRentalsChart').getContext('2d');
+        var weeklyRentalsChart = new Chart(weeklyRentalsCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: weeklyRentalsData.length }, (_, i) => 'S' + (i + 1)),
+                datasets: [{
+                    label: 'Alugueres',
+                    data: weeklyRentalsData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: 'rgba(59, 130, 246, 0.8)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return 'Alugueres: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        display: false,
+                        beginAtZero: true,
+                        grid: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

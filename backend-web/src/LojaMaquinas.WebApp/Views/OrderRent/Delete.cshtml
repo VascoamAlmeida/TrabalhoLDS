@@ -1,0 +1,59 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.OrderRent.OrderRentViewModel
+
+@{
+    ViewData["Title"] = "Remover Aluguer";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <h5 class="mb-0 fw-bold">Remover Aluguer</h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <p class="mb-3">
+                        Tem a certeza que pretende remover este aluguer?
+                        <span class="text-muted d-block small">
+                            Esta ação é permanente e não pode ser desfeita.
+                        </span>
+                    </p>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Id</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4">Data Início</dt>
+                        <dd class="col-sm-8">@Model.InitialDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4">Data Fim</dt>
+                        <dd class="col-sm-8">@Model.EndDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4">Estado</dt>
+                        <dd class="col-sm-8">@Model.Status</dd>
+                    </dl>
+                </div>
+
+                <div class="card-footer bg-light border-0 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <form asp-action="Delete" method="post" class="m-0">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger px-4">
+                            Remover
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>

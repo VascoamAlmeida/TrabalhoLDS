@@ -1,0 +1,108 @@
+﻿@model LojaMaquinas.WebApp.ViewModels.MVC.Contracts.ContractSuccessViewModel
+@{
+	ViewData["Title"] = "Sucesso";
+}
+
+<div class="success-page d-flex align-items-center justify-content-center">
+	<div class="success-card shadow-sm">
+
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h5 class="mb-0 fw-bold text-dark">Sucesso</h5>
+			<a asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none">
+				<i class="fas fa-times"></i>
+			</a>
+		</div>
+
+		<div class="text-center my-4">
+			<div class="check-circle mx-auto mb-3">
+				<i class="fas fa-check"></i>
+			</div>
+			<h4 class="fw-bold mb-2">Pedido Confirmado</h4>
+			<p class="text-muted small mb-0">
+				O seu pedido foi processado com sucesso.
+			</p>
+		</div>
+
+		<div class="card border-0 shadow-xs mb-4">
+			<div class="card-body p-3">
+				<div class="detail-row">
+					<span class="detail-label">Nome do Equipamento</span>
+					<span class="detail-value">@Model.EquipmentName</span>
+				</div>
+				<hr />
+				<div class="detail-row">
+					<span class="detail-label">Valor</span>
+					<span class="detail-value text-primary fw-semibold">
+						@Model.Total.ToString("C2", new System.Globalization.CultureInfo("pt-PT"))
+					</span>
+				</div>
+				<hr />
+				<div class="detail-row">
+					<span class="detail-label">Tipo de Transação</span>
+					<span class="detail-value">Aluguer</span>
+					@* Se quiseres usar um campo no model, troca "Aluguer" por @Model.TransactionType *@
+				</div>
+				<hr />
+				<div class="detail-row">
+					<span class="detail-label">Número de Referência</span>
+					<span class="detail-value fw-semibold">@Model.ReferenceNumber</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-grid">
+			<a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg rounded-3">
+				Voltar ao Catálogo
+			</a>
+		</div>
+	</div>
+</div>
+
+<style>
+	.success-page {
+		min-height: calc(100vh - 80px);
+		background-color: #f3f4f6;
+	}
+
+	.success-card {
+		background: #ffffff;
+		border-radius: 18px;
+		padding: 24px 20px 28px;
+		max-width: 380px;
+		width: 100%;
+	}
+
+	.check-circle {
+		width: 80px;
+		height: 80px;
+		border-radius: 999px;
+		background-color: #e0f2fe;
+		color: #0ea5e9;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 32px;
+	}
+
+	.detail-row {
+		display: flex;
+		flex-direction: column;
+		font-size: 0.9rem;
+		padding: 4px 0;
+	}
+
+	.detail-label {
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: .06em;
+		color: #9ca3af;
+	}
+
+	.detail-value {
+		color: #111827;
+	}
+
+	.shadow-xs {
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+	}
+</style>

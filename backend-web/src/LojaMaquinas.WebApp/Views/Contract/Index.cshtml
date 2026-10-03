@@ -1,0 +1,332 @@
+﻿@model IEnumerable<LojaMaquinas.WebApp.ViewModels.MVC.Contracts.ContractViewModel>
+
+@{
+	ViewData["Title"] = "Lista de Contracts";
+}
+
+<div class="contract-container">
+	<h2 class="mb-3">Contratos</h2>
+
+	@if (Model != null && Model.Any())
+	{
+		@foreach (var contract in Model)
+		{
+			<div class="contract-card d-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded">
+				<div class="d-flex align-items-center">
+					<div class="me-3 contract-icon">
+						<i class="fas fa-file-signature"></i>
+					</div>
+					<div>
+						<div class="fw-bold">
+							Contrato #@contract.Id.ToString().Substring(0, 6).ToUpper()
+						</div>
+						<div class="text-muted">
+							Aluguer: @contract.OrderRentId
+						</div>
+					</div>
+				</div>
+
+				<a asp-action="Details"
+				   asp-route-id="@contract.Id"
+				   class="btn btn-sm btn-outline-primary">
+					<i class="fas fa-search"></i>&nbsp;Detalhes
+				</a>
+			</div>
+		}
+	}
+	else
+	{
+		<div class="empty-state">
+			<i class="fas fa-file-signature"></i>
+			<p>Nenhum contrato encontrado</p>
+		</div>
+	}
+</div>
+</div>
+
+
+<style>
+	.transaction-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 30px 20px;
+	}
+
+	.page-title {
+		font-size: 28px;
+		font-weight: 700;
+		color: #1a1a1a;
+		margin-bottom: 30px;
+	}
+
+	.filters-section {
+		background-color: white;
+		padding: 20px;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		margin-bottom: 30px;
+	}
+
+	.filters-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 15px;
+		align-items: end;
+	}
+
+	.filter-group {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.filter-label {
+		font-size: 13px;
+		font-weight: 600;
+		color: #666;
+		margin-bottom: 6px;
+	}
+
+	.filter-select,
+	.filter-input {
+		padding: 10px 12px;
+		border: 1px solid #dee2e6;
+		border-radius: 6px;
+		font-size: 14px;
+		background-color: #f8f9fa;
+		transition: all 0.3s;
+	}
+
+		.filter-select:focus,
+		.filter-input:focus {
+			outline: none;
+			border-color: #0099cc;
+			background-color: white;
+		}
+
+	.transaction-list {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.transaction-card {
+		background-color: #f5f5f5;
+		border-radius: 12px;
+		padding: 24px;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		gap: 24px;
+		align-items: flex-start;
+		transition: background-color 0.2s, box-shadow 0.2s;
+		cursor: pointer;
+		position: relative;
+	}
+
+		.transaction-card:hover {
+			background-color: #ececec;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		}
+
+	.card-icon-wrapper {
+		width: 50px;
+		height: 50px;
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+		.card-icon-wrapper.sale {
+			background-color: #d6eaf8;
+			color: #2980b9;
+		}
+
+		.card-icon-wrapper.rent {
+			background-color: #d6eaf8;
+			color: #2980b9;
+		}
+
+		.card-icon-wrapper i {
+			font-size: 22px;
+		}
+
+	.card-main-content {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		min-width: 0;
+	}
+
+	.card-header {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.transaction-title {
+		font-size: 17px;
+		font-weight: 700;
+		color: #2c3e50;
+		line-height: 1.3;
+	}
+
+	.transaction-date {
+		font-size: 13px;
+		color: #7f8c8d;
+		font-weight: 400;
+	}
+
+	.card-details {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		margin-top: 4px;
+	}
+
+	.detail-line {
+		font-size: 14px;
+		color: #5a6c7d;
+		line-height: 1.4;
+	}
+
+		.detail-line strong {
+			font-weight: 600;
+			color: #34495e;
+		}
+
+	.card-right-section {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.transaction-amount {
+		font-size: 20px;
+		font-weight: 700;
+		color: #2c3e50;
+		white-space: nowrap;
+	}
+
+	.status-badge {
+		padding: 5px 14px;
+		border-radius: 14px;
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+		.status-badge.completed {
+			background-color: #d4edda;
+			color: #28a745;
+		}
+
+		.status-badge.active {
+			background-color: #fff3cd;
+			color: #ffc107;
+		}
+
+		.status-badge.pending {
+			background-color: #ffe5cc;
+			color: #fd7e14;
+		}
+
+		.status-badge.cancelled {
+			background-color: #f8d7da;
+			color: #dc3545;
+		}
+
+	.empty-state {
+		text-align: center;
+		padding: 80px 20px;
+		color: #999;
+	}
+
+		.empty-state i {
+			font-size: 48px;
+			margin-bottom: 16px;
+			color: #ddd;
+		}
+
+		.empty-state p {
+			font-size: 16px;
+			margin: 0;
+		}
+
+	.card-actions {
+		position: absolute;
+		bottom: 16px;
+		right: 16px;
+		display: flex;
+		gap: 8px;
+		z-index: 10;
+	}
+
+	.btn-action {
+		width: 36px;
+		height: 36px;
+		border-radius: 8px;
+		border: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-size: 14px;
+	}
+
+	.btn-edit {
+		background-color: #0099cc;
+		color: white;
+	}
+
+		.btn-edit:hover {
+			background-color: #007aa3;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0, 153, 204, 0.3);
+		}
+
+	.btn-delete {
+		background-color: #dc3545;
+		color: white;
+	}
+
+		.btn-delete:hover {
+			background-color: #c82333;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+		}
+
+	.btn-pdf {
+		background-color: #28a745;
+		color: white;
+	}
+
+		.btn-pdf:hover {
+			background-color: #218838;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+		}
+
+	.btn-cancel-order {
+		background-color: #ffc107;
+		color: #212529;
+	}
+
+		.btn-cancel-order:hover {
+			background-color: #e0a800;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+		}
+
+	.btn-complete-order {
+		background-color: #17a2b8;
+		color: white;
+	}
+
+		.btn-complete-order:hover {
+			background-color: #138496;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+		}
+</style>

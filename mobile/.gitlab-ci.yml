@@ -1,0 +1,59 @@
+
+image: ghcr.io/cirruslabs/flutter:stable
+stages:
+  - tests
+  - coverage
+cache:
+  key: "flutter-pub-cache"
+  paths:
+    - .pub-cache
+    - .dart_tool
+    - build
+flutter-tests:
+  stage: tests
+  only:
+    - main
+    - dev
+    - devTest
+  script:
+    # Vai buscar dependências
+    - flutter pub get
+    
+    # 1) Unit + widget tests (tudo o que estiver em "test/")
+    #    Estes TEM de passar – se falhar aqui, a pipeline chumba.
+    - flutter test --coverage --coverage-path=coverage/lcov.info test
+    # 2) Integration tests (pasta "integration_test/")
+    #    Estes ainda dependem de backend, OneSignal, etc.
+    #    Por isso deixamos correr mas NÃO deixam a pipeline falhar.
+    - flutter test -d flutter-tester integration_test || true
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+    expire_in: 7 days
+    
+coverage-report:
+  stage: coverage
+  needs:
+    - flutter-tests
+  only:
+    - main
+    - dev
+    - devTest
+  script:
+    # Instala lcov para converter o lcov.info em HTML
+    - apt-get update && apt-get install -y lcov
+    # 1) Filtra ficheiros que não queres contar na cobertura
+    - lcov --remove coverage/lcov.info 'lib/core/constants/*' 'lib/widgets/*' 'lib/services/*' -o coverage/filtered.info
+
+    # Gera HTML a partir do coverage/lcov.info
+    - genhtml coverage/filtered.info -o coverage_report
+    
+    # Mostra um resumo de percentagens no logs
+    - lcov --summary coverage/filtered.info
+  artifacts:
+    paths:
+      - coverage_report
+      - coverage/filtered.info
+      - coverage/lcov.info
+    expire_in: 7 days
